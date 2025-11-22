@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  api:
+    build: ./api
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
+      - REDIS_URL=redis://redis:6379/0
+    ports:
+      - "8000:8000"
+
+  worker:
+    build: ./worker
+    depends_on:
+      - redis
+      - api
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - API_URL=http://api:8000
+      - CONSUMER_NAME=worker1
+
+volumes:
+  pgdata:
