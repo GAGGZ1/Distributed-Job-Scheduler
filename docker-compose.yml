@@ -34,6 +34,16 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - API_URL=http://api:8000
       - CONSUMER_NAME=worker1
+      - PYTHONUNBUFFERED=1
+  scheduler:
+    build: ./scheduler
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
+      - REDIS_URL=redis://redis:6379/0
+      - PYTHONUNBUFFERED=1
 
 volumes:
   pgdata:

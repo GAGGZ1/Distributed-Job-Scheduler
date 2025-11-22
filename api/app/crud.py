@@ -1,8 +1,17 @@
 from sqlalchemy.orm import Session
 import models, schemas
+from croniter import croniter
+from datetime import datetime, timezone
+
 
 def create_job(db: Session, job_in: schemas.JobCreate):
-    job = models.Job(name=job_in.name, command=job_in.command, schedule=job_in.schedule, retries=job_in.retries)
+
+    next_run = None
+    if job_in.schedule:
+        iter = croniter(job_in.schedule, datetime.now(timezone.utc))
+        next_run=iter.get_next(datetime)
+
+    job = models.Job(name=job_in.name, command=job_in.command, schedule=job_in.schedule, retries=job_in.retries,next_run_at=next_run)
     db.add(job)
     db.commit()
     db.refresh(job)

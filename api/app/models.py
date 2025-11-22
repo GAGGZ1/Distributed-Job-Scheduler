@@ -24,6 +24,7 @@ class Job(Base):
     retries = Column(Integer, default=0)
     status = Column(Enum(JobStatus), default=JobStatus.scheduled)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    next_run_at = Column(DateTime(timezone=True), nullable=True)
     
 
 class Execution(Base):
@@ -35,3 +36,4 @@ class Execution(Base):
     started_at = Column(DateTime(timezone=True), nullable=True)
     finished_at = Column(DateTime(timezone=True), nullable=True)
     logs = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
